@@ -1,0 +1,58 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+
+{% block title %}
+Content
+{% endblock title %}
+
+{% block content %}
+{% if post %}
+    <h5>
+        Author: {{ post.author }}&emsp;&emsp;
+        Title: <i>{{ post.title|truncatewords:2 }}</i>&emsp;&emsp;
+        Publication date: {{ post.postingDate|date:'d M Y' }} &emsp;
+        Category: {{ post.category }}
+    </h5>
+    <h5>Content: {{ post.body|truncatewords:5 }}</h5>
+        <br>
+            {% if post.upload %}
+            <img src="{{ post.upload.url }}" width="500">
+            {% endif %}
+
+
+    <div class="d-flex justify-content-md-center">
+        {% if replies %}
+        <ul>
+            {% for reply in replies %}
+            <li>
+                <h4><b>Reply:</b></h4>
+                <a href="{% url 'reply_detail' pk=reply.id %}">{{ reply.text|truncatewords:2 }}</a>
+                        (Author: {{reply.author}}, Status:
+                {% if reply.status == False or reply.status == None %}
+                Not accepted
+                {% else %}
+                Accepted
+                {% endif %})
+            </li>
+        </ul>
+            {% endfor %}
+        {% else %}
+            <h4>No replies found!</h4>
+        {% endif %}
+    </div>
+    <!-- Divider-->
+    <hr class="my-4" />
+    <!-- Pager-->
+    {% if request.user.is_authenticated and request.user != post.author %}
+    <div class="d-flex justify-content-center mb-4">
+        <a class="btn btn-primary text-uppercase" href="{% url 'reply_create' pk=post.id %}">
+            Leave reply →</a>
+    </div>
+    {% else %}
+    {{ empty }}
+    {% endif %}
+{% else %}
+    <h2>Publication not found!</h2>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<hr>
+  <h3>Reply on: {{ reply_id.post.title }} by {{ reply_id.post.author }}</h3>
+
+  <p><strong>Author:</strong> {{ reply_id.author }}</p>
+  <p><strong>Text:</strong> {{ reply_id.body }}</p>
+  <p><strong>Date:</strong> {{ reply_id.postingDate }}</p>
+  <p><strong>Status:</strong>
+    {% if reply_id.status == False or None %}
+    Not accepted
+    {% else %}
+    Accepted
+    {% endif %}
+  </p>
+
+{% endblock %}

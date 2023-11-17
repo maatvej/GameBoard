@@ -1,0 +1,79 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_tags %}
+
+{% block title %}
+Replies to {{ user.get_username }}'s announces
+{% endblock title %}
+
+{% block content %}
+<h1 class="text-center">List of replies to my posts</h1>
+    <h3>{% current_time '%b %d %Y' %}</h3>
+    <hr>
+    {# Добавляем форму, которая объединяет набор полей, которые будут отправляться в запросе #}
+   <form action="" method="get">
+       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+       {{ filterset.form.as_p }}
+       {# Добавим кнопку отправки данных формы #}
+       <input type="submit" value="Найти" />
+   </form>
+    {% if replies %}
+        <table>
+           <tr>
+               <td>Author </td>
+               <td>Content </td>
+               <td>Date of posting </td>
+               <td>Status </td>
+               <td>Actions</td>
+           </tr>
+            {% for reply in replies %}
+            {% if request.user == reply.post.author and request.user != reply.author %}
+           <tr>
+               <td>{{ reply.author }}</td>
+               <td><a href="{% url 'reply_detail' pk=reply.id %}">{{ reply.body|truncatewords:5 }}</a></td>
+               <td>{{ reply.postingDate|date:'d M Y' }}</td>
+               <td>{% if reply.status == False or None %} Not accepted
+                {% else %}
+                Accepted
+                {% endif %}</td>
+               <td>
+                   {% if request.user == reply.post.author and reply.status == False %}
+                    <p class="d-flex justify-content:flex-end mb-5">
+                        <a class="btn btn-primary text-uppercase"
+                           href="{% url 'reply_accept' reply_id=reply.id post_id=reply.post.id %}">Accept →</a>
+                    </p>
+                    {% else %}
+                    {{empty}}
+                    {% endif %}
+               </td>
+           </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    {% else %}
+       <h2>No reply found!</h2>
+    {% endif %}
+<div class="text-center">
+    {# Добавляем пагинацию на страницу #}
+
+    {# Информация о предыдущих страницах #}
+    {% if page_obj.has_previous %}
+       {# Для каждой ссылки пагинации указываем обработку через новый тег #}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+    <hr>
+</div>
+{% endblock content %}

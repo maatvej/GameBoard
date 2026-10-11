@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'REMOVED-SECRET-KEY'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-only-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -97,24 +97,19 @@ ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "shaktilaurie@gmail.com"
-EMAIL_HOST_PASSWORD = "REMOVED-APP-PASSWORD"
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 EMAIL_SUBJECT_PREFIX = None
 
-DEFAULT_FROM_EMAIL = "shaktilaurie@gmail.com"
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 SITE_URL = 'http://127.0.0.1:8000'
 
-# SERVER_EMAIL = "shaktilaurie@gmail.com"
-MANAGERS = (
-    ('Admin', 'admin@example.com'),
-)
-ADMINS = (
-    ('Admin', 'admin@example.com'),
-)
+ADMINS = [('Admin', os.environ['DJANGO_ADMIN_EMAIL'])] if os.environ.get('DJANGO_ADMIN_EMAIL') else []
+MANAGERS = ADMINS
 
 WSGI_APPLICATION = 'gameboard.wsgi.application'
 
